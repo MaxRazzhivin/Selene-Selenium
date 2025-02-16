@@ -3,8 +3,9 @@
 .idea
 ../.idea/
 .DS-Store
-../DS_store
+../.DS_store
 .DS-Store/
+tests/.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
