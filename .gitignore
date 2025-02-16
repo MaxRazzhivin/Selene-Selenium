@@ -2,6 +2,9 @@
 /venv
 .idea
 ../.idea/
+.DS-Store
+../DS_store
+.DS-Store/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
