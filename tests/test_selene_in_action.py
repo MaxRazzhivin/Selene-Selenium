@@ -4,7 +4,7 @@ import os
 
 def test_complete_do():
     browser.open('/')
-    browser.driver.execute_script("$('#fixedban').remove()")
+    browser.driver.execute_script("$('#RightSide_Advertisement').remove()")
 
     browser.element('#firstName').type('Max')
     browser.element('#lastName').type('Razzhivin')
