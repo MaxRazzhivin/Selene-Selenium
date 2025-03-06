@@ -1,47 +1,50 @@
-from selene import browser, by, be, have
+from selene import browser, by, be, have, command
 import os
 
 
 def test_complete_do():
     browser.open('/')
+
+    # Удаляем рекламу
     browser.driver.execute_script("$('#RightSide_Advertisement').remove()")
     browser.driver.execute_script("$('#fixedban').remove()")
     browser.driver.execute_script("$('footer').remove()")
 
+
     browser.element('#firstName').type('Max')
     browser.element('#lastName').type('Razzhivin')
     browser.element('#userEmail').type('max.nvo06@gmail.com')
-    browser.element('label[class=custom-control-label]').click()
-    browser.element('[placeholder="Mobile Number"]').type('9094618666')
+    browser.all('[name=gender]').element_by(have.value('Male')).element("..").click()
+    browser.element('#userNumber').type('9094618666')
 
     # Выбираем дату рождения:
     browser.element('#dateOfBirth').click()
-    browser.element('.react-datepicker__month-select').click().element('option[value="3"]').click()
-    browser.element('.react-datepicker__year-select').click().element('option[value="1989"]').click()
+    browser.element('.react-datepicker__month-select').type("April")
+    browser.element('.react-datepicker__year-select').type("1989")
     browser.element('.react-datepicker__day--006').click()
 
     # Предметы
-    browser.element('#subjectsInput').type('English').press_enter()
+    browser.element('#subjectsInput').type('Computer Science').press_tab()
 
     # Хобби
-    browser.element('#hobbiesWrapper [for="hobbies-checkbox-1"]').click()
-    browser.element('#hobbiesWrapper [for="hobbies-checkbox-2"]').click()
+    browser.all('.custom-checkbox').element_by(have.exact_text('Sports')).click()
+    browser.all('.custom-checkbox').element_by(have.exact_text('Reading')).click()
 
-    browser.element('#uploadPicture').send_keys(os.path.abspath("picta.png"))
+    browser.element('#uploadPicture').send_keys(os.path.abspath("resources/picta.png"))
 
     browser.element('#currentAddress').click().type('somewhere in galaxy')
 
     browser.element('#state').click().element(by.text('NCR')).click()
     browser.element('#city').click().element(by.text('Delhi')).click()
 
-    browser.element('#submit').click()
+    browser.element('#submit').perform(command.js.click)
 
     browser.element(".table").should(have.text("Max Razzhivin"))
     browser.element(".table").should(have.text("max.nvo06@gmail.com"))
     browser.element(".table").should(have.text("Male"))
     browser.element('.table').should(have.text('9094618666'))
     browser.element('.table').should(have.text('06 April,1989'))
-    browser.element('.table').should(have.text('English'))
+    browser.element('.table').should(have.text('Computer Science'))
     browser.element('.table').should(have.text('Sports, Reading'))
     browser.element('.table').should(have.text('picta.png'))
     browser.element('.table').should(have.text('somewhere in galaxy'))
