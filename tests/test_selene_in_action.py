@@ -1,52 +1,44 @@
-from selene import browser, by, be, have, command
-import os
+from pages.registration_page import RegistrationPage
 
 
 def test_complete_do():
-    browser.open('/')
+    registration_page = RegistrationPage()
+    registration_page.open()
 
-    # Удаляем рекламу
-    browser.driver.execute_script("$('#RightSide_Advertisement').remove()")
-    browser.driver.execute_script("$('#fixedban').remove()")
-    browser.driver.execute_script("$('footer').remove()")
+    registration_page.fill_first_name('Max')
+    registration_page.fill_last_name('Razzhivin')
+    registration_page.fill_email('max.nvo06@gmail.com')
+    registration_page.fill_gender('Male')
 
-
-    browser.element('#firstName').type('Max')
-    browser.element('#lastName').type('Razzhivin')
-    browser.element('#userEmail').type('max.nvo06@gmail.com')
-    browser.all('[name=gender]').element_by(have.value('Male')).element("..").click()
-    browser.element('#userNumber').type('9094618666')
+    registration_page.fill_user_number('9094618666')
 
     # Выбираем дату рождения:
-    browser.element('#dateOfBirth').click()
-    browser.element('.react-datepicker__month-select').type("April")
-    browser.element('.react-datepicker__year-select').type("1989")
-    browser.element('.react-datepicker__day--006').click()
+    registration_page.fill_date_of_birth('1989', 'April', '06')
 
     # Предметы
-    browser.element('#subjectsInput').type('Computer Science').press_tab()
+    registration_page.fill_subjects('Computer Science')
 
     # Хобби
-    browser.all('.custom-checkbox').element_by(have.exact_text('Sports')).click()
-    browser.all('.custom-checkbox').element_by(have.exact_text('Reading')).click()
+    registration_page.fill_hobbies('Sports', 'Reading')
 
-    browser.element('#uploadPicture').send_keys(os.path.abspath("resources/picta.png"))
+    registration_page.fill_image()
 
-    browser.element('#currentAddress').click().type('somewhere in galaxy')
+    registration_page.fill_address('somewhere in galaxy')
 
-    browser.element('#state').click().element(by.text('NCR')).click()
-    browser.element('#city').click().element(by.text('Delhi')).click()
+    registration_page.fill_state('NCR')
+    registration_page.fill_city('Delhi')
 
-    browser.element('#submit').perform(command.js.click)
+    registration_page.submit()
 
-    browser.element(".table").should(have.text("Max Razzhivin"))
-    browser.element(".table").should(have.text("max.nvo06@gmail.com"))
-    browser.element(".table").should(have.text("Male"))
-    browser.element('.table').should(have.text('9094618666'))
-    browser.element('.table').should(have.text('06 April,1989'))
-    browser.element('.table').should(have.text('Computer Science'))
-    browser.element('.table').should(have.text('Sports, Reading'))
-    browser.element('.table').should(have.text('picta.png'))
-    browser.element('.table').should(have.text('somewhere in galaxy'))
-    browser.element('.table').should(have.text('NCR Delhi'))
-    browser.element('#closeLargeModal').should(be.clickable)
+    registration_page.should_registered_user_with("Max Razzhivin",
+            "max.nvo06@gmail.com",
+            'Male',
+            '9094618666',
+            '06 April,1989',
+            'Computer Science',
+            'Sports, Reading',
+            'picta.png',
+            'somewhere in galaxy',
+            'NCR Delhi',)
+
+    registration_page.button_close_should_be_clickable()
