@@ -25,7 +25,9 @@ class RegistrationPage:
 
     def open(self):
         browser.open('/')
-        browser.element('footer').execute_script('element.remove()')
+        browser.driver.execute_script("$('#RightSide_Advertisement').remove()")
+        browser.driver.execute_script("$('#fixedban').remove()")
+        browser.driver.execute_script("$('footer').remove()")
         return self
 
     def fill_first_name(self, value):
@@ -41,7 +43,7 @@ class RegistrationPage:
         return self
 
     def select_gender(self, value):
-        browser.element(f'[value={value}]').element('..').click()
+        browser.all('[name=gender]').element_by(have.value(value)).element("..").click()
         return self
 
     def fill_phone_number(self, value):
@@ -56,11 +58,11 @@ class RegistrationPage:
         return self
 
     def fill_subject(self, value):
-        self.subjects_input.type(value).press_enter()
+        self.subjects_input.type(value).press_tab()
         return self
 
     def select_hobby(self, value):
-        self.hobbies.element_by(have.text(value)).click()
+        browser.all('.custom-checkbox').element_by(have.exact_text(value)).click()
         return self
 
     def select_picture(self, value):
@@ -100,7 +102,7 @@ class RegistrationPage:
         return self
 
     def should_have_registered(self, user: User):
-        browser.element('.table').all('td:nth-child(2)').should(have.texts(
+        browser.element('.table').all('td').even.should(have.texts(
             f'{user.first_name} {user.last_name}',
             user.email,
             user.gender,
