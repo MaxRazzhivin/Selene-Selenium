@@ -4,9 +4,6 @@ from selene import have, by, be, command
 
 
 class RegistrationPage:
-    def __init__(self):
-        self.path_to_image = os.path.abspath("picta.png")
-
     def open(self):
         browser.open('/')
 
@@ -44,7 +41,7 @@ class RegistrationPage:
         browser.all('.custom-checkbox').element_by(have.exact_text(value2)).click()
 
     def fill_image(self):
-        browser.element('#uploadPicture').send_keys(self.path_to_image)
+        browser.element('#uploadPicture').send_keys(os.path.abspath("../resources/picta.png"))
 
     def fill_address(self, value):
         browser.element('#currentAddress').click().type(value)
