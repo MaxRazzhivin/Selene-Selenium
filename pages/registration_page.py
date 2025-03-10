@@ -40,8 +40,9 @@ class RegistrationPage:
         browser.all('.custom-checkbox').element_by(have.exact_text(value1)).click()
         browser.all('.custom-checkbox').element_by(have.exact_text(value2)).click()
 
-    def fill_image(self):
-        browser.element('#uploadPicture').send_keys(os.path.abspath("../resources/picta.png"))
+    def fill_image(self, path):
+        browser.element("#uploadPicture").send_keys(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), f"../resources/{path}")))
 
     def fill_address(self, value):
         browser.element('#currentAddress').click().type(value)

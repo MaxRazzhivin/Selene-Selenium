@@ -21,7 +21,7 @@ def test_complete_do():
     # Хобби
     registration_page.fill_hobbies('Sports', 'Reading')
 
-    registration_page.fill_image()
+    registration_page.fill_image('picta.png')
 
     registration_page.fill_address('somewhere in galaxy')
 
