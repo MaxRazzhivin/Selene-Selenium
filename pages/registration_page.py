@@ -5,7 +5,7 @@ from selene import have, by, be, command
 
 class RegistrationPage:
     def __init__(self):
-        self.path_to_image = os.path.abspath("../resources/picta.png")
+        self.path_to_image = os.path.abspath("picta.png")
 
     def open(self):
         browser.open('/')
