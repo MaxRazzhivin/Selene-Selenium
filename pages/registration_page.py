@@ -59,16 +59,16 @@ class RegistrationPage:
                                     state_city):
         browser.element(".table").all('td').even.should(
             have.exact_texts(
-                "Max Razzhivin",
-                "max.nvo06@gmail.com",
-                'Male',
-                '9094618666',
-                '06 April,1989',
-                'Computer Science',
-                'Sports, Reading',
-                'picta.png',
-                'somewhere in galaxy',
-                'NCR Delhi',
+                full_name,
+                email,
+                gender,
+                mobile,
+                date_of_birth,
+                subject,
+                hobbies,
+                image_name,
+                address,
+                state_city,
         ))
 
     def button_close_should_be_clickable(self):
