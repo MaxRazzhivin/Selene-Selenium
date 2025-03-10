@@ -66,7 +66,7 @@ class RegistrationPage:
         return self
 
     def select_picture(self, value):
-        self.upload_picture.set_value(os.path.abspath(f'resources/{value}'))
+        self.upload_picture.send_keys(os.path.abspath(f'resources/{value}'))
         return self
 
     def fill_current_address(self, value):
