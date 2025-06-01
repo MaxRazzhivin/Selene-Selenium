@@ -15,6 +15,9 @@ browser.should(have.title('DEMOQA')) # проверка, что вкладка �
 
 # Элемент по селектору «main-header» должен содержать текст «Box»
 browser.element('.main-header').should(have.text('Box'))
+
+# Когда надо перезаписать какой-то параметр из конфига для конкретного элемента - команда .with_()
+browser.element('blablabla').with_(timeout=browser.config.timeout*1.5).should(have.size(3))
 ```
 
 ```bash
