@@ -287,8 +287,10 @@ def browser_management():
 ## Настройки для записи экрана при локальных тестах 
 
 ```bash
-- brew install ffmpeg 
+brew install ffmpeg 
+```
 
+```bash
 import subprocess
 import time
 from selene import browser
