@@ -1,6 +1,8 @@
 import pytest
-from selene import browser
 from selenium import webdriver
+import subprocess
+import time
+from selene import browser
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -13,7 +15,32 @@ def browser_management():
     driver_options.page_load_strategy = 'eager'
     browser.config.driver_options = driver_options
 
+    # Функция для начала записи видео
+    def start_recording():
+        command = [
+            'ffmpeg',
+            '-y',  # перезаписать файл без подтверждения
+            '-f', 'avfoundation',  # захват экрана
+            '-s', '1680x1050',  # размер экрана
+            '-i', '4',  # входной сигнал (дисплей)
+            '-c:v', 'libx264',  # кодек
+            '-preset', 'ultrafast',  # скорость кодирования
+            'output.mp4'  # имя выходного файла
+        ]
+        return subprocess.Popen(command)
+
+    # Начало записи
+    video_process = start_recording()
+    time.sleep(2)  # Небольшая задержка для начала записи
+
 
     yield
+
+    # Функция для остановки записи видео
+    def stop_recording(process):
+        process.terminate()  # Остановить процесс ffmpeg
+
+    # Остановка записи
+    stop_recording(video_process)
 
     browser.quit()

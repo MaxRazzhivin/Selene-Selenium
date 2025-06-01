@@ -231,3 +231,97 @@ browser.element('element').perform(command.drag_and_drop_to('element2'))
 Где element - это элемент, который нужно переместить(к примеру это точка на слайдере), а element2 - это элемент, куда нужно переместить.
 ```
 
+## Локаторы шпаргалка:
+
+
+```bash
+# open TodoMVC page
+browser.open('https://todomvc-emberjs-app.autotest.how/')
+
+# add todos: 'a', 'b', 'c'
+browser.element('#new-todo').type('a').press_enter()
+browser.element('#new-todo').type('b').press_enter()
+browser.element('#new-todo').type('c').press_enter()
+
+# todos should be 'a', 'b', 'c'
+browser.all('#todo-list>li').should(have.exact_texts('a', 'b', 'c'))
+
+# toggle 'b'
+browser.all('#todo-list>li').element_by(have.exact_text('b')) \
+    .element('.toggle').click()
+
+# completed todos should be 'b'
+browser.all('#todo-list>li').by(have.css_class('completed')) \
+    .should(have.exact_texts('b'))
+
+# active todos should be 'a', 'c'
+browser.all('#todo-list>li').by(have.no.css_class('completed')) \
+    .should(have.exact_texts('a', 'c'))
+```
+
+## Также нам понадобится файл conftest.py для настроек браузера и фикстур
+
+```bash
+import pytest
+from selene import browser
+from selenium import webdriver
+
+@pytest.fixture(scope='function', autouse=True)
+def browser_management():
+    browser.config.base_url = 'https://todomvc.com/examples/emberjs'
+    
+    driver_options = webdriver.ChromeOptions()
+    browser.config.driver_options = driver_options
+    
+    Опциональная настройка, чтобы тесты запускались без открытия браузера
+    driver_options.add_argument('--headless')
+    
+    Опциональная настройка - таймаут для поиска элемента. По-умолчанию 4 секунды стоит
+    browser.config.timeout = 2.0
+    
+    yield
+    
+    browser.quit()
+```
+
+## Настройки для записи экрана при локальных тестах 
+
+```bash
+- brew install ffmpeg 
+
+import subprocess
+import time
+from selene import browser
+
+# Функция для начала записи видео
+def start_recording():
+    command = [
+        'ffmpeg',
+        '-y',  # перезаписать файл без подтверждения
+        '-f', 'x11grab',  # захват экрана / на macOs 'avfoundation'
+        '-s', '1920x1080',  # размер экрана / либо разрешение своего экрана
+        '-i', ':4',  # входной сигнал (дисплей) / источник видеосигнала для записи
+        # источник можно узнать через  'ffmpeg -f avfoundation -list_devices true -i ""', вроде даже экран телефона можно записать через нее
+        
+        '-c:v', 'libx264',  # кодек
+        '-preset', 'ultrafast',  # скорость кодирования
+        'output.mp4'  # имя выходного файла
+    ]
+    return subprocess.Popen(command)
+
+# Функция для остановки записи видео
+def stop_recording(process):
+    process.terminate()  # Остановить процесс ffmpeg
+
+# Начало записи
+video_process = start_recording()
+time.sleep(2)  # Небольшая задержка для начала записи
+
+# Ваши тесты
+browser.open('https://example.com')
+# ... ваши действия с браузером ...
+
+# Остановка записи
+stop_recording(video_process)
+
+```
