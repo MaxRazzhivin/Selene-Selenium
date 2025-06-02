@@ -3,14 +3,15 @@ from selenium import webdriver
 import subprocess
 import time
 from selene import browser
+import os
 
 
 @pytest.fixture(scope='function', autouse=True)
 def browser_management():
-    browser.config.window_height = 1680
-    browser.config.window_width = 1050
-    browser.config.base_url = 'https://demoqa.com/automation-practice-form'
-    browser.config.timeout = 4.0
+    browser.config.window_height = os.getenv('window_height', 1680)
+    browser.config.window_width = os.getenv('window_width', 1050)
+    browser.config.base_url = os.getenv('base_url', 'https://demoqa.com/automation-practice-form')
+    browser.config.timeout = float(os.getenv('timeout', '4'))
     driver_options = webdriver.ChromeOptions()
     browser.config.driver_options = driver_options
 

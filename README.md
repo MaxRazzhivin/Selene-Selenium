@@ -443,6 +443,38 @@ save.click()
 
 
 ```
+## Как запустить с другими переменными среды из терминала, например, ширина/высота окна браузера или другим url:
+
+```bash
+1) conftest.py -> дописываем import os
+2) в conftest.py -> по параметрам, которые планируем менять параметры при запуске меняем формат на: 
+
+    browser.config.window_height = os.getenv('window_height', 1680)
+    browser.config.window_width = os.getenv('window_width', 1050)
+    browser.config.base_url = os.getenv('base_url', 'https://demoqa.com/automation-practice-form')
+    browser.config.timeout = os.getenv('timeout', 4.0)
+
+Т.о. если мы запускаем через pytest в терминале без параметров дополнительных, будут отправлены значения по-умолчанию справа
+
+Либо запуск через команду: 
+
+base_url = 'https://todomvc/com' window_height = '900' pytest tests
+
+либо через env -s, это позволит передавать имена через . 
+
+env -s 'base_url = https://todomvc/com window_height = 900' pytest tests
+
+```
+
+## Как зафризить UI на сайте, который пропадает после клика по нему: 
+
+```bash
+1) Открываем DevTools на вкладке - Console
+2) Выбираем элемент/инпут поле на сайте - который появляется и пропадает
+3) Отправляем в консоль команду setTimeout('debugger', 3000) - 3000 мс, это 3 секунды, можно изменить
+4) За эти 3 секунды вызываем элемент / поле инпут и он должен зафризиться, можем снять с него корректный локатор
+5) Чтобы разморозить, нажимаем на play знак на центре экрана
+```
 
 
 
