@@ -477,6 +477,30 @@ env -s 'base_url = https://todomvc/com window_height = 900' pytest tests
 ```
 
 
+## Создание второго браузера для запуска одновременно на двух
+
+```bash
+def test_todos_storage_is_not_shared_between_browsers():
+    
+    browser.open('https://todomvc-emberjs-app.autotest.how/')
+
+    # add todos: 'a', 'b', 'c'
+    browser.element('#new-todo').type('a').press_enter()
+    browser.element('#new-todo').type('b').press_enter()
+    browser.element('#new-todo').type('c').press_enter()
+
+    # todos should be 'a', 'b', 'c'
+    browser.all('#todo-list>li').should(have.exact_texts('a', 'b', 'c'))
+    
+    browser2 = Browser(Config(driver=webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))))
+    
+    browser2.open('https://todomvc-emberjs-app.autotest.how/')
+    browser2.element('#new-todo').type('d').press_enter()
+    
+    browser2.all('#todo-list>li').should(have.exact_texts('d'))
+```
+
+
 
 ## Настройки для записи экрана при локальных тестах 
 
