@@ -20,6 +20,18 @@ browser.element('.main-header').should(have.text('Box'))
 browser.element('blablabla').with_(timeout=browser.config.timeout*1.5).should(have.size(3))
 ```
 
+## Небольшая часть аналогий локаторов между Selene и Selenium
+
+```bash
+Selene: 
+browser.all('#todo-list>li').should(have.size(3)) - поиск списка и проверка на количество элементов == 3
+
+Selenium:
+assert len(browser.driver.find_elements(*by.css('todo-list>li'))) == 3 - то же самое, только не хватает еще явного ожидания (Explicite wait)
+
+assert и find_elements - не ждут пока подгрузятся элементы, они сразу кидают ошибку, если элемент не найден, поэтому в Selenium нужны ожидания
+```
+
 ```bash
 Если необходимо обратиться к элементу по атрибуту for="gender-radio-1", то запись будет выглядеть так:
 
@@ -263,6 +275,7 @@ browser.all('#todo-list>li').by(have.no.css_class('completed')) \
 ```
 
 ## Также нам понадобится файл conftest.py для настроек браузера и фикстур
+### Файл conftest.py рекомендуется хранить вместе с тестами в одной папке, чтобы он случайно не зааффектил другие файлы, которые начинаются на test...
 
 ```bash
 import pytest
@@ -286,6 +299,61 @@ def browser_management():
     
     browser.quit()
 ```
+
+## Пример, если на проекте используется Selenium и как мы можем прикрутить Selene
+
+```bash
+Допусти там будет фикстура от Selenium примерно такого вида: 
+
+@pytest.fixture()
+def driver():
+    driver_options = webdriver.ChromeOptions()
+    driver_options.add_argument('--headless')
+    driver = webdriver.Chrome(
+        service=ChromeService(executable_path=ChromeDriverManager().install()),
+        options=driver_options,
+    )
+      
+    yield driver
+    
+    driver.quit()
+```
+
+```bash
+Тогда мы пишем еще одну фикстуру: 
+
+@pytest.fixture()
+def browser(driver):
+    
+    yield Browser(Config(driver=driver)) - Browser и Config импортируем из Selene
+
+```
+
+```bash
+Теперь допустим у нас любой тест на чистом Selenium WebDriver
+
+def test_complete_to_do(driver):
+    driver.get('https://todomvc.com/examples/emberjs')
+    
+    driver.find_element(*by.css('#new-todo')).send_keys('a' + Keys.ENTER)
+    driver.find_element(*by.css('#new-todo')).send_keys('b' + Keys.ENTER)
+    driver.find_element(*by.css('#new-todo')).send_keys('c' + Keys.ENTER)
+    
+    
+Тогда мы в эту функцию передаем фикстуру для Selene, которую написали выше, и можем постепенно заменять код на код из Selene,
+например, заменим нахождение первой строки '#new-todo'
+
+def test_complete_to_do(driver, browser):
+    driver.get('https://todomvc.com/examples/emberjs')
+    
+    browser.element('#new-todo').type('a').press_enter()
+    driver.find_element(*by.css('#new-todo')).send_keys('b' + Keys.ENTER)
+    driver.find_element(*by.css('#new-todo')).send_keys('c' + Keys.ENTER)
+```
+
+
+
+
 
 ## Настройки для записи экрана при локальных тестах 
 
