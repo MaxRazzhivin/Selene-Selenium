@@ -274,6 +274,75 @@ browser.all('#todo-list>li').by(have.no.css_class('completed')) \
     .should(have.exact_texts('a', 'c'))
 ```
 
+## Работа с элементами, которые выделяют массив элементов типа browser.all
+
+```bash
+browser.all('#todo-list>li').should(have.size(3))
+browser.all('#todo-list>li').first.should(have.exact_text('a'))
+browser.all('#todo-list>li').second.should(have.exact_text('b')) - после first и second обращаемся по индексам [2]
+browser.all('#todo-list>li')[2].should(have.exact_text('c'))
+
+Либо эти 3 последние строки мы можем записать 1 строкой
+
+browser.all('#todo-list>li').should(have.exact_texts('a', 'b', 'c'))
+
+Для выбора одного пункта из 3х, найдем один чекбокс из них и кликнем, чтобы отметить 
+ 
+browser.all('#todo-list>li').element_by(have.exact_text('b')).element('.toggle').click()
+
+Проверим, что после клика класс .completed появился только у одного элемента 'b':
+
+browser.all('#todo-list>li').by(have.css_class('completed')).should(have.exact_texts('b'))
+
+Теперь, что остальные элементы остались нетронутые и не приобрели класс .completed: 
+
+browser.all('#todo-list>li').by(have.no.css_class('completed')).should(have.exact_texts('a', 'c'))
+
+```
+
+## Обработка плавающих элементов и всплывающих окон, которые могут появиться, а могут и нет: 
+
+```bash
+Для этого есть команда .wait_until(condition). Если такой элемент не дождутся, код не упадет с таким wait, а пойдет дальше: 
+
+if browser.element('#crazy_alert_that_appears_sometimes_and_sometimes_not').wait_until(be.visible):
+    browser.element('#close_crazy_alert').click()
+    
+Либо его альтернатива, но без ожидания через .matching(condition):
+
+if browser.matching(have.no.title('TodoMvc')):
+    print('Developers went crazy again and screwed up my favourite app title')
+
+```
+
+## Обработка через клавиатуарное сочетание CMD/ctrl + 'A' для выделения всего, например:
+
+```bash
+browser.element('#new-todo').type(Keys.COMMAND + 'a' + Keys.NULL)
+
+Keys.NULL - снимает выделение
+
+Для перезаписи текста чем-то другим: 
+
+browser.element('#new-todo').type(Keys.COMMAND + 'a' + Keys.NULL + 'this text will overwrite original text')
+
+либо через команду send_keys() - она позволяет слать больше 1 параметра:
+
+browser.element('#new-todo').send_keys(
+    Keys.COMMAND + 'a', 
+    Keys.NULL, 
+    'this text will overwrite original text')
+
+для ясности чтения кода можно заменить Keys.NULL на release_keys:
+    release_keys = Keys.NULL
+    browser.element('#new-todo').send_keys(
+        Keys.COMMAND + 'a',
+        release_keys,
+        'this text will overwrite original text',
+    ) 
+ 
+```
+
 ## Также нам понадобится файл conftest.py для настроек браузера и фикстур
 ### Файл conftest.py рекомендуется хранить вместе с тестами в одной папке, чтобы он случайно не зааффектил другие файлы, которые начинаются на test...
 
@@ -351,7 +420,29 @@ def test_complete_to_do(driver, browser):
     driver.find_element(*by.css('#new-todo')).send_keys('c' + Keys.ENTER)
 ```
 
+## Дополнительные команды через JS с помощью импорт from selene import Command
 
+```bash
+Это позволит выполнить ряд команд через perform(command.js. ....)
+Например, click или scroll_into_view
+
+Еще помощью JS можно сразу ввести много текста, т.к. Selene по-умолчанию будет вводить посимвольно:
+В conftest.py добавляем настройку selene_browser.config.type_by_js = True 
+
+Либо можем настроить не через конфтест, а выборочно для элемента: 
+browser.element('#save').with_(click_by_js=True).click()
+browser.element('#save').with_(type_by_js=True).type('blablablablablabla')
+
+Подход с кликом через JS полезен, когда нам надо сделать много кликов и мы для этого сохраним в переменной:
+save = browser.element('#save').with_(click_by_js=True)
+save.click()
+save.click()
+save.click()
+save.click()
+save.click()
+
+
+```
 
 
 
