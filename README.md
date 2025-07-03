@@ -20,6 +20,114 @@ browser.element('.main-header').should(have.text('Box'))
 browser.element('blablabla').with_(timeout=browser.config.timeout*1.5).should(have.size(3))
 ```
 
+## Дан список или таблица эламентов - выбираем один из них
+
+```bash
+browser.all('#todo-list>li') - выбираем все элементы li из списка ul
+.element_by_its('label', have.exact_text('b')) - один из элементов, у которого текст внутри b
+
+browser.all('#todo-list>li').element_by_its('label', have.exact_text('b')).element('.toggle').click()
+
+либо 
+browser.all('#todo-list>li').element_by(have.exact_text('b').element('.toggle').click()
+
+.element_by_its используется, чтобы точнее выбрать элемент с конкретным атрибутом
+
+browser.all('.table tr') - выбрали все элемент таблицы, вернее ее строки tr
+.element_by_its('td:nth-of-type(1)', have.exact_text('Mobile')) - среди всех строк выбрали первые столбцы и один с текстом Mobile
+.element('.remove') - допустим там кнопка с css классом remove и на нее нажали 
+
+browser.all('.table tr').element_by_its('td:nth-of-type(1)', have.exact_text('Mobile')).element('.remove').click()
+
+
+Если у нас два элемента с конкретным критерием и надо один из них: 
+
+.element_by_its меняется на .by_its и второй элемент из двух выбираем через .second
+
+browser.all('#todo-list>li').by_its('label', have.exact_text('b')).second.element('.toggle').click()
+
+
+Либо еще вариант проверки, что элемент стал видимым (be.visible): 
+
+browser.all('#todo-list>li').element_by_its('.special-flag', be.visible).element('.toggle').click()
+
+Есть еще вариант с be.present - означает, что в html он есть, но его может быть не видно
+
+```
+
+## Когда элемент перекрыт версткой соседнего
+
+```bash
+browser.all('[name=gender]').element_by(have.value('Female')).element("..").click()
+
+Здесь как пример, находим все 3 элемента с [name=gender], выбираем один с [value=Female],
+но радио-баттн перекрыт соседним элементом с текстом, поэтому находим его 
+и поднимаемся на уровень выше через xpath селектор (.element("..")), где они оба и можно сделать клик (.click())
+
+```
+
+## Когда часть названия элемента используется
+
+```bash
+Например элемент: 
+
+<div id="react-select-3-option-0" class="css-9gakcf-option" tabindex="-1">NCR</div>
+
+Можно выбрать через:
+
+[id^=react-select] - означает, что элемент начинается в названии на "react-select"
+
+[id*=option] - добавляем эту опцию, которая означает, что id содержит слово option внутри (react-select-3-option-0)
+
+Все вместе делается слитно для того, чтобы отфильтровать лишние элементы, которые начинаются с react-select (их много в примере)
+
+Все вместе для выбора элемента: 
+
+browser.all('[id^=react-select][id*=option]') - так мы нашли все элементы по двум этим критериям
+
+browser.all('[id^=react-select][id*=option]').element_by(have.exact_text('Haryana')) - здесь среди них выбрать один с точным текстом
+
+Если бы выбрали have.text('Haryana') - искал бы по тексту любому, где есть одно из слов Haryana
+
+have.exact_text - для точного совпадения, ни символом больше или меньше
+
+```
+
+## Удаление из выборки элементов лишние
+
+```bash
+Например есть ряд элементов, среди которых есть нужные нам, но и лишние, которые мешают тесту 
+
+browser.element(f'.react-datepicker__day--0{11}') - ok, если с числом 11 только 1 элемент, но нам надо вырезать еще один лишний
+
+Добавляем тогда - :not(.react-datepicker__day--outside-month) - это класс лишних элементов в примере
+
+
+browser.element(f'.react-datepicker__day--0{11}'):not(.react-datepicker__day--outside-month).click()
+
+
+```
+
+## Отправка текста в инпут поле через сочетание кнопок CMD+A
+
+```bash
+from selenium.webdriver import Keys
+
+browser.element('#dateOfBirthInput').send_keys(Keys.COMMAND, 'a').type(
+  '11 May 1999'
+).press_enter()
+  
+Либо универсальная для мак и винды
+
+import sys
+
+browser.element('#dateOfBirthInput').send_keys(
+  Keys.COMMAND if sys.platform == 'darwin' else Keys.CONTROL, 'a'
+).type('11 May 1999').press_enter()
+  
+
+```
+
 ## Небольшая часть аналогий локаторов между Selene и Selenium
 
 ```bash
@@ -201,6 +309,11 @@ from selene import browser
 import os
 
 browser.element('element').send_keys(os.path.abspath('picture.png')) # загрузка файла. Вместо 'picture.png' указать путь к файлу и наименование файла.
+
+browser.element('#uploadPicture').set_value(
+        os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../resources/picta.png')
+    )) # пример когда отсчет пути будет от папки, в которой лежит данный тест и к ней потом присоединяем путь к файлу
 
 Если нет тега input с атрибутом type="file", то нужно использовать метод drop_file из `command.js:
 
@@ -440,7 +553,6 @@ save.click()
 save.click()
 save.click()
 save.click()
-
 
 ```
 ## Как запустить с другими переменными среды из терминала, например, ширина/высота окна браузера или другим url:

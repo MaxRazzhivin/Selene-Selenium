@@ -3,14 +3,14 @@ import os
 
 
 def test_complete_do():
-    browser.open('/')
+    browser.open('/automation-practice-form')
 
     # Удаляем рекламу
     browser.driver.execute_script("$('#RightSide_Advertisement').remove()")
     browser.driver.execute_script("$('#fixedban').remove()")
     browser.driver.execute_script("$('footer').remove()")
 
-
+    # WHEN
     browser.element('#firstName').type('Max')
     browser.element('#lastName').type('Razzhivin')
     browser.element('#userEmail').type('max.nvo06@gmail.com')
@@ -23,6 +23,7 @@ def test_complete_do():
     browser.element('.react-datepicker__year-select').type("1989")
     browser.element('.react-datepicker__day--006').click()
 
+
     # Предметы
     browser.element('#subjectsInput').type('Computer Science').press_tab()
 
@@ -30,23 +31,32 @@ def test_complete_do():
     browser.all('.custom-checkbox').element_by(have.exact_text('Sports')).click()
     browser.all('.custom-checkbox').element_by(have.exact_text('Reading')).click()
 
-    browser.element('#uploadPicture').send_keys(os.path.abspath("resources/picta.png"))
+    browser.element('#uploadPicture').set_value(
+        os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../resources/picta.png')
+    ))
 
     browser.element('#currentAddress').click().type('somewhere in galaxy')
+
+    # Добавил скролл для маленьких экранов до элемента
+    browser.element('#state').perform(command.js.scroll_into_view)
 
     browser.element('#state').click().element(by.text('NCR')).click()
     browser.element('#city').click().element(by.text('Delhi')).click()
 
     browser.element('#submit').perform(command.js.click)
 
-    browser.element(".table").should(have.text("Max Razzhivin"))
-    browser.element(".table").should(have.text("max.nvo06@gmail.com"))
-    browser.element(".table").should(have.text("Male"))
-    browser.element('.table').should(have.text('9094618666'))
-    browser.element('.table').should(have.text('06 April,1989'))
-    browser.element('.table').should(have.text('Computer Science'))
-    browser.element('.table').should(have.text('Sports, Reading'))
-    browser.element('.table').should(have.text('picta.png'))
-    browser.element('.table').should(have.text('somewhere in galaxy'))
-    browser.element('.table').should(have.text('NCR Delhi'))
+    # THEN
+    browser.element('.table').all('td').even.should(
+        have.texts(
+            "Max Razzhivin",
+            "max.nvo06@gmail.com",
+            "Male",
+            '9094618666',
+            '06 April,1989',
+            'Computer Science',
+            'Sports, Reading',
+            'picta.png',
+            'somewhere in galaxy',
+            'NCR Delhi'))
     browser.element('#closeLargeModal').should(be.clickable)
