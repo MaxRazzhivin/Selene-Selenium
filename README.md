@@ -284,6 +284,16 @@ browser.element('#firstName').set_value('Иванов Иван')
 from selene import browser, have
 
 browser.element('#firstName').should(have.value('Иванов Иван'))
+
+Еще выбор месяца был в тесте, мы делали через .type
+
+browser.element('.react-datepicker__month-select').type("April")
+
+Но в каких-то браузерах может не сработать и решение другое: 
+
+browser.element('.react-datepicker__month-select').click()
+browser.element('.react-datepicker__month-select').all('option').element_by(have.exact_text('April')).click()
+
 ```
 
 ## Опции для браузера
