@@ -15,6 +15,7 @@ def browser_management():
     driver_options = webdriver.ChromeOptions()
     browser.config.driver_options = driver_options
 
+
     # Функция для начала записи видео
     def start_recording():
         command = [
