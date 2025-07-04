@@ -3,6 +3,7 @@ import os
 
 
 def test_complete_do():
+    # GIVEN:
     browser.open('/automation-practice-form')
 
     # Удаляем рекламу
