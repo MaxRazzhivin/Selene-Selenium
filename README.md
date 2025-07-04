@@ -32,6 +32,42 @@ browser.element('.main-header').should(have.text('Box'))
 browser.element('blablabla').with_(timeout=browser.config.timeout*1.5).should(have.size(3))
 ```
 
+## Несколько однотипных элементов и выбираем среди них один
+
+```bash
+browser.all('[data-testid=gender]').element_by(have.value('Reading')).click()
+
+если атрибута value нет, то используем have.attribute
+
+browser.all('[data-testid=gender]').element_by(have.attribute('data-value').value('Italian')).click()
+```
+
+
+## Проверка элемента на наличие класса какого-то вроде if
+
+```bash
+У нас есть элемент, который надо выбрать кликом и появится класс .Mui-focused, но может быть и выбран, тогда 
+клик не нужен и можно сразу делать .type. С этим поможет .matching
+
+Ниже проверка на этот кейс: 
+
+if not browser.element('data-testid=dateOfBirth').element('..').matching(
+    have.css_class('Mui-focused')
+):
+    browser.element('data-testid=dateOfBirth').click()
+browser.element('data-testid=dateOfBirth').type('15121985')
+
+```
+
+## Отправка команд клавиатурных через ActionChains из Selenium
+
+```bash
+Не забыть импорт класса ActionChains только
+
+ActionChains(browser.driver).send_keys(Keys.TAB).perform()
+
+```
+
 ## Дан список или таблица эламентов - выбираем один из них
 
 ```bash
