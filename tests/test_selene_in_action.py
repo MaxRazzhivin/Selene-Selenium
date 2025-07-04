@@ -21,7 +21,7 @@ def test_complete_do():
     browser.element('#dateOfBirth').click()
     browser.element('.react-datepicker__month-select').type("April")
     browser.element('.react-datepicker__year-select').type("1989")
-    browser.element('.react-datepicker__day--006').click()
+    browser.element('.react-datepicker__day--006:not(.react-datepicker__day--outside-month)').click()
 
 
     # Предметы
